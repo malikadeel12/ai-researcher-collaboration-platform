@@ -1,0 +1,35 @@
+/**
+ * What changed: Editorial design tokens for the Markaz research-center look.
+ * Why: Warm paper + ink + teal avoids generic purple SaaS / AI-template styling.
+ * Related: src/styles/global.css
+ */
+:root {
+  --paper: #f6f3ec;
+  --paper-warm: #fbfaf4;
+  --ink: #1c2430;
+  --ink-soft: #3d4a5c;
+  --muted: #6b6458;
+  --teal: #1a4544;
+  --teal-deep: #123534;
+  --copper: #c45c26;
+  --gold: #c4A46a;
+  --sage: #3e6b54;
+  --clay: #a33b2b;
+  --amber: #b07d2a;
+  --card: #fffcf7;
+  --line: #e3d9c8;
+  --line-strong: #d2c6b0;
+
+  --serif: "Fraunces", "Times New Roman", serif;
+  --sans: "Source Sans 3", "IBM Plex Sans Arabic", sans-serif;
+  --arabic: "IBM Plex Sans Arabic", "Source Sans 3", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --radius: 7px;
+  --max: 1120px;
+  --header-h: 64px;
+}
+
+[lang="ar"] {
+  --sans: "IBM Plex Sans Arabic", "Source Sans 3", sans-serif;
+}

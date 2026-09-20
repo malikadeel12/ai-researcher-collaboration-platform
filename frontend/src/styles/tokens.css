@@ -1,6 +1,6 @@
 /**
- * What changed: Quiet Atelier tokens — more air, one metal accent, motion timing.
- * Why: Same Markaz colours, but spacing and gold are used like a research institute letterhead.
+ * What changed: Copper retired; gold kept as the only metal; status hues quieted.
+ * Why: Two metals looked like jewellery. One gold, used rarely, reads more premium.
  * Related: src/styles/global.css
  */
 :root {
@@ -11,11 +11,10 @@
   --muted: #6b6458;
   --teal: #1a4544;
   --teal-deep: #123534;
-  --copper: #c45c26;
   --gold: #c4a46a;
-  --sage: #3e6b54;
-  --clay: #a33b2b;
-  --amber: #b07d2a;
+  --sage: #4a6756;
+  --clay: #8a4a40;
+  --amber: #8f7340;
   --card: #fffcf7;
   --line: #e3d9c8;
   --line-strong: #d2c6b0;

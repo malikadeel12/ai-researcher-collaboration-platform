@@ -10,11 +10,10 @@ import { AuthProvider } from './context/AuthContext'
 import { I18nProvider } from './context/I18nContext'
 import { DirectorDashboard } from './pages/DirectorDashboard'
 import { Login } from './pages/Login'
-import { MyRequests } from './pages/MyRequests'
 import { Recommendations } from './pages/Recommendations'
 import { Register } from './pages/Register'
 import { ResearcherProfile } from './pages/ResearcherProfile'
-import { SubmitNeed } from './pages/SubmitNeed'
+import { UserDashboard } from './pages/UserDashboard'
 
 export default function App() {
   return (
@@ -29,7 +28,7 @@ export default function App() {
                 path="/need"
                 element={
                   <ProtectedRoute>
-                    <SubmitNeed />
+                    <UserDashboard />
                   </ProtectedRoute>
                 }
               />
@@ -49,14 +48,7 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/requests"
-                element={
-                  <ProtectedRoute>
-                    <MyRequests />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="/requests" element={<Navigate to="/need" replace />} />
               <Route
                 path="/director"
                 element={

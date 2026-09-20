@@ -1,6 +1,6 @@
 /**
- * What changed: Auth is a light editorial gate; rest stays Quiet Atelier.
- * Why: The costume letter login failed — this page is calm and readable instead.
+ * What changed: Copper gone; gold only on nav line, selected dossier, letterhead rule.
+ * Why: One quiet metal reads premium. Extra gold on kickers and avatars looked busy.
  * Related: src/styles/tokens.css
  */
 @import "./tokens.css";
@@ -293,7 +293,7 @@ textarea {
 .btn-text,
 .chip,
 .lang-toggle button,
-.inbox-item,
+.desk-item,
 .dossier {
   transition: background var(--ease), border-color var(--ease), color var(--ease), opacity var(--ease);
 }
@@ -391,7 +391,7 @@ textarea {
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--muted);
   margin: 0 0 12px;
 }
 
@@ -441,12 +441,16 @@ textarea {
 }
 
 .letter textarea:focus {
-  border-color: var(--gold);
+  border-color: var(--teal);
 }
 
 /* --- Need composer --- */
 .composer {
   max-width: 760px;
+}
+
+.desk-stage .composer {
+  max-width: none;
 }
 
 .chips {
@@ -520,7 +524,7 @@ textarea {
   border-radius: 3px;
   background: var(--paper);
   color: var(--teal);
-  border: 1px solid var(--gold);
+  border: 1px solid var(--line-strong);
   display: grid;
   place-items: center;
   font-family: var(--serif);
@@ -639,7 +643,7 @@ textarea {
 }
 
 .meta-row a {
-  color: var(--copper);
+  color: var(--teal);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -678,54 +682,150 @@ textarea {
   font-size: 18px;
 }
 
-/* --- Inbox / director --- */
-.inbox {
+/* --- Director reading desk --- */
+.desk {
   display: grid;
-  grid-template-columns: 340px 1fr;
-  gap: 0;
-  min-height: calc(100vh - var(--header-h) - 120px);
-  border: 1px solid var(--line);
-  background: var(--card);
+  grid-template-columns: 300px 1fr;
+  min-height: calc(100vh - var(--header-h));
 }
 
-.inbox-list {
+.desk-queue {
   border-inline-end: 1px solid var(--line);
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
-.inbox-item {
+.desk-queue-head {
+  padding: 28px 28px 8px;
+}
+
+.desk-queue-head h1 {
+  margin: 0;
+  font-size: 32px;
+}
+
+.desk-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  padding: 16px 28px 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.desk-tabs button {
+  border: 0;
+  background: transparent;
+  padding: 0 0 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.desk-tabs button span {
+  font-family: var(--mono);
+  font-size: 11px;
+  margin-inline-start: 6px;
+}
+
+.desk-tabs button.on {
+  color: var(--ink);
+  box-shadow: inset 0 -1px 0 var(--ink);
+}
+
+.desk-list {
+  overflow: auto;
+  flex: 1;
+}
+
+.desk-item {
   display: block;
   width: 100%;
   text-align: start;
   background: transparent;
   border: 0;
+  border-inline-start: 2px solid transparent;
+  padding: 16px 28px;
   border-bottom: 1px solid var(--line);
-  border-inline-start: 3px solid transparent;
-  padding: 18px 20px;
 }
 
-.inbox-item:hover {
-  background: var(--paper);
+.desk-item strong,
+.desk-item em {
+  display: block;
+  font-style: normal;
 }
 
-.inbox-item.on {
-  background: var(--paper);
-  border-inline-start-color: var(--gold);
-}
-
-.inbox-item h3 {
-  margin: 8px 0 6px;
+.desk-item strong {
+  margin: 4px 0 4px;
+  font-family: var(--serif);
+  font-weight: 500;
   font-size: 16px;
 }
 
-.inbox-detail {
-  padding: 36px 40px;
+.desk-item em {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.desk-item:hover {
+  background: var(--paper-warm);
+}
+
+.desk-item.on {
+  background: var(--card);
+  border-inline-start-color: var(--gold);
+}
+
+.desk-stage {
+  padding: 36px 48px 64px;
+  overflow: auto;
+}
+
+.desk-letter {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.desk-name {
+  margin: 0 0 4px;
+  font-size: 34px;
+}
+
+.desk-brief {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 20px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.desk-people {
+  list-style: none;
+  margin: 0 0 28px;
+  padding: 0;
+}
+
+.desk-people li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.desk-people a {
+  display: block;
+  color: var(--ink);
+}
+
+.desk-people span {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .quote {
   background: transparent;
   border: 0;
-  border-inline-start: 2px solid var(--gold);
+  border-inline-start: 2px solid var(--teal);
   padding: 4px 0 4px 16px;
   margin: 16px 0 28px;
   color: var(--ink-soft);
@@ -739,7 +839,7 @@ textarea {
 }
 
 .linkish {
-  color: var(--copper);
+  color: var(--teal);
 }
 
 .empty {
@@ -767,7 +867,7 @@ textarea {
   .btn-text,
   .chip,
   .lang-toggle button,
-  .inbox-item,
+  .desk-item,
   .dossier,
   input,
   textarea {
@@ -778,9 +878,13 @@ textarea {
 @media (max-width: 900px) {
   .grid,
   .folio,
-  .inbox,
+  .desk,
   .letter-row {
     grid-template-columns: 1fr;
+  }
+
+  .desk-stage {
+    padding: 24px 20px 48px;
   }
 
   .auth-spread {

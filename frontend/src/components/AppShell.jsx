@@ -16,7 +16,7 @@ export function AppShell() {
   return (
     <div className="shell">
       <header className="header">
-        <NavLink to={user ? '/need' : '/login'} className="brand">
+        <NavLink to={user ? (user.role === 'director' ? '/director' : '/need') : '/login'} className="brand">
           <Seal size={28} />
           <span className="brand-mark">{t.brand}</span>
           <span className="brand-sub">{t.brandSub}</span>
@@ -25,9 +25,11 @@ export function AppShell() {
         <nav className="nav">
           {user && (
             <>
-              <NavLink to="/need">{t.navNeed}</NavLink>
-              <NavLink to="/requests">{t.navRequests}</NavLink>
-              {user.role === 'director' && <NavLink to="/director">{t.navDirector}</NavLink>}
+              {user.role === 'director' ? (
+                <NavLink to="/director">{t.navDirector}</NavLink>
+              ) : (
+                <NavLink to="/need">{t.navDesk}</NavLink>
+              )}
             </>
           )}
           <LanguageToggle />

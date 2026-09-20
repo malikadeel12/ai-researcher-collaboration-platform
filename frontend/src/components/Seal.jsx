@@ -1,10 +1,10 @@
 /**
- * What changed: Small gold monogram used as the institutional seal.
- * Why: A mark on login and header makes Markaz feel like a center, not a word on a page.
+ * What changed: Seal ring is teal now, not gold.
+ * Why: Gold is reserved for the header line, selected card, and letterhead rule.
  * Related: src/components/AppShell.jsx, src/pages/Login.jsx
  */
 export function Seal({ tone = 'ink', size = 36 }) {
-  const ring = tone === 'light' ? '#C4A46A' : '#C4A46A'
+  const ring = '#1A4544'
   const fill = tone === 'light' ? '#F6F3EC' : '#1A4544'
   const letter = tone === 'light' ? '#1A4544' : '#F6F3EC'
 

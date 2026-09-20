@@ -1,7 +1,7 @@
 /**
- * What changed: Seal ring is teal now, not gold.
- * Why: Gold is reserved for the header line, selected card, and letterhead rule.
- * Related: src/components/AppShell.jsx, src/pages/Login.jsx
+ * What changed: Seal back to the original teal mark.
+ * Why: Bright blue looked cheap. This is the mark from the premium pass the client liked.
+ * Related: src/styles/tokens.css, frontend/public/favicon.svg
  */
 export function Seal({ tone = 'ink', size = 36 }) {
   const ring = '#1A4544'

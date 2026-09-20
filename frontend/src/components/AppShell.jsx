@@ -1,6 +1,6 @@
 /**
- * What changed: Header now uses the seal, a gold active line, and a quiet sign-out.
- * Why: Premium clients read the chrome first — the bar should feel like letterhead, not a SaaS nav.
+ * What changed: Nav label is Home; chrome stays letterhead, not a SaaS bar.
+ * Why: “Desk” belonged to the old inbox layout. Home is the user starting point.
  * Related: src/components/Seal.jsx
  */
 import { NavLink, Outlet } from 'react-router-dom'

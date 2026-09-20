@@ -42,7 +42,7 @@ export function ResearcherProfile() {
   if (!researcher) return null
 
   return (
-    <main className="page">
+    <main className="page rise">
       <Link className="btn-text" to={-1}>
         {t.back}
       </Link>

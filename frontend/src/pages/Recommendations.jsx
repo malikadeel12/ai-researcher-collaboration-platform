@@ -1,7 +1,8 @@
 /**
- * What changed: Recommendation page keeps the brief quote and uses a single teal submit.
- * Why: Copper CTAs were too loud for the atelier finish.
- * Related: backend/src/routes/match.js, backend/src/routes/requests.js
+ * What changed: Closest fit is featured; others sit as a comparison, not equal cards.
+ * Why: A flat grid hid the ranking and looked like a template catalog.
+ * Related: src/components/ResearcherCard.jsx, backend/src/routes/match.js
+ * MCP Context 7: React 19 local selection state, no form library.
  */
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -39,7 +40,7 @@ export function Recommendations() {
           note,
         }),
       })
-      navigate('/requests')
+      navigate('/need')
     } catch (err) {
       setError(err.message)
     } finally {
@@ -57,10 +58,15 @@ export function Recommendations() {
 
   if (!match) return null
 
+  const [featured, ...others] = match.individuals
   const teamSelected = selection?.type === 'team'
+  const selectedLabel =
+    selection?.type === 'team'
+      ? t.team
+      : match.individuals.find((item) => item.researcher.id === selection?.ids?.[0])?.researcher.fullName
 
   return (
-    <main className="page">
+    <main className="page compare rise">
       <div className="section-head">
         <div>
           <p className="kicker">{t.recKicker}</p>
@@ -72,25 +78,40 @@ export function Recommendations() {
       </div>
 
       <p className="quote">{match.needText}</p>
-      {error && <p className="error">{error}</p>}
+      {error ? <p className="error">{error}</p> : null}
 
-      <h2 style={{ fontSize: 28, margin: '28px 0 16px' }}>{t.individuals}</h2>
-      <div className="grid">
-        {match.individuals.map((item) => (
+      {featured ? (
+        <>
+          <p className="kicker">{t.featuredMatch}</p>
           <ResearcherCard
-            key={item.researcher.id}
-            researcher={item.researcher}
-            reason={item.reason}
-            score={item.score}
-            selected={selection?.type === 'individual' && selection.ids[0] === item.researcher.id}
-            onSelect={() =>
-              setSelection({ type: 'individual', ids: [item.researcher.id] })
-            }
+            variant="feature"
+            researcher={featured.researcher}
+            reason={featured.reason}
+            score={featured.score}
+            selected={selection?.type === 'individual' && selection.ids[0] === featured.researcher.id}
+            onSelect={() => setSelection({ type: 'individual', ids: [featured.researcher.id] })}
           />
-        ))}
-      </div>
+        </>
+      ) : null}
 
-      <h2 style={{ fontSize: 28, margin: '40px 0 8px' }}>{t.team}</h2>
+      {others.length > 0 ? (
+        <section className="compare-list">
+          <p className="kicker">{t.otherMatches}</p>
+          {others.map((item) => (
+            <ResearcherCard
+              key={item.researcher.id}
+              variant="compact"
+              researcher={item.researcher}
+              reason={item.reason}
+              score={item.score}
+              selected={selection?.type === 'individual' && selection.ids[0] === item.researcher.id}
+              onSelect={() => setSelection({ type: 'individual', ids: [item.researcher.id] })}
+            />
+          ))}
+        </section>
+      ) : null}
+
+      <h2 className="compare-team-title">{t.team}</h2>
       {match.team ? (
         <TeamCard
           members={match.team.members}
@@ -104,12 +125,33 @@ export function Recommendations() {
 
       <div className="block" style={{ marginTop: 36, maxWidth: 640 }}>
         <label htmlFor="note">{t.optionalNote}</label>
-        <textarea id="note" value={note} onChange={(e) => setNote(e.target.value)} placeholder={t.requestNotePh} style={{ minHeight: 110 }} />
+        <textarea
+          id="note"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder={t.requestNotePh}
+          style={{ minHeight: 110 }}
+        />
       </div>
 
-      <button className="btn" type="button" disabled={!selection || busy} onClick={submit}>
-        {busy ? t.submitting : t.submitRequest}
-      </button>
+      {/* Sticky dock keeps the decision in reach after scrolling the comparison. */}
+      <div className="compare-dock">
+        <p>
+          {selection ? (
+            <>
+              <span className="kicker" style={{ marginBottom: 4 }}>
+                {t.selectedNow}
+              </span>
+              <strong>{selectedLabel}</strong>
+            </>
+          ) : (
+            <span className="muted">{t.compareHint}</span>
+          )}
+        </p>
+        <button className="btn" type="button" disabled={!selection || busy} onClick={submit}>
+          {busy ? t.submitting : t.submitRequest}
+        </button>
+      </div>
     </main>
   )
 }

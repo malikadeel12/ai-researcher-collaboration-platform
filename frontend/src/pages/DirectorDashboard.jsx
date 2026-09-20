@@ -1,7 +1,8 @@
 /**
- * What changed: Director screen is a reading desk — queue + letter — not a boxed inbox.
- * Why: Title, chips, and a ticket panel made the dashboard feel like support software.
+ * What changed: Review letter is now a two-column spread — brief left, decision right.
+ * Why: A 720px letter left a whole empty half on wide screens.
  * Related: backend/src/routes/requests.js
+ * MCP Context 7: React 19 useMemo for filter counts, no extra state library.
  */
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -48,7 +49,7 @@ export function DirectorDashboard() {
     () => requests.filter((item) => filter === 'all' || item.status === filter),
     [requests, filter],
   )
-  const active = requests.find((item) => item.id === activeId) || visible[0]
+  const active = visible.find((item) => item.id === activeId) || visible[0]
 
   async function decide(status) {
     if (!active) return
@@ -75,20 +76,23 @@ export function DirectorDashboard() {
     return t[key]
   }
 
+  function openRequest(item) {
+    setActiveId(item.id)
+    setNote(item.directorNote || '')
+  }
+
   return (
-    <main className="desk">
-      <aside className="desk-queue">
-        <div className="desk-queue-head">
-          <p className="kicker" style={{ marginBottom: 6 }}>
-            {t.queue}
-          </p>
+    <main className="review rise">
+      {/* --- Review header: title + waiting count, not a sidebar --- */}
+      <header className="review-head">
+        <div>
+          <p className="kicker">{t.reviewKicker}</p>
           <h1>{t.directorTitle}</h1>
-          <p className="muted" style={{ margin: '6px 0 0', fontSize: 13 }}>
-            {counts.pending} {t.waiting}
+          <p className="lede" style={{ marginBottom: 0 }}>
+            {counts.pending} {t.waiting}. {t.directorLede}
           </p>
         </div>
-
-        <div className="desk-tabs" role="tablist">
+        <div className="review-filters" role="tablist">
           {FILTERS.map((key) => (
             <button
               key={key}
@@ -102,98 +106,93 @@ export function DirectorDashboard() {
             </button>
           ))}
         </div>
+      </header>
 
-        {error && <p className="error">{error}</p>}
+      {error ? <p className="error">{error}</p> : null}
 
-        <div className="desk-list">
-          {visible.length === 0 ? (
-            <p className="empty">{t.emptyInbox}</p>
-          ) : (
-            visible.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                className={`desk-item ${active?.id === item.id ? 'on' : ''}`}
-                onClick={() => {
-                  setActiveId(item.id)
-                  setNote(item.directorNote || '')
-                }}
-              >
-                <span className="mono muted">{item.code}</span>
-                <strong>{item.requesterName}</strong>
-                <em>
-                  {item.needText.slice(0, 72)}
-                  {item.needText.length > 72 ? '…' : ''}
-                </em>
-              </button>
-            ))
-          )}
+      {/* --- Horizontal codes so this is not a mail list --- */}
+      {visible.length === 0 ? (
+        <p className="empty">{t.emptyInbox}</p>
+      ) : (
+        <div className="review-rail">
+          {visible.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className={`rail-chip ${active?.id === item.id ? 'on' : ''}`}
+              onClick={() => openRequest(item)}
+            >
+              <span className="mono muted">{item.code}</span>
+              <strong>{item.requesterName}</strong>
+              <em>
+                {item.needText.slice(0, 56)}
+                {item.needText.length > 56 ? '…' : ''}
+              </em>
+            </button>
+          ))}
         </div>
-      </aside>
+      )}
 
-      <section className="desk-stage">
-        {!active ? (
-          <p className="empty">{t.emptyInbox}</p>
-        ) : (
-          <article className="letter desk-letter">
-            <header className="letterhead">
-              <div>
-                <p className="mono muted" style={{ margin: 0 }}>
-                  {active.code}
-                </p>
-                <p className="muted" style={{ margin: '8px 0 0', fontSize: 13 }}>
-                  {dateFmt.format(new Date(active.createdAt))}
-                </p>
-              </div>
-              <StatusStamp status={active.status} />
-            </header>
-            <hr className="gold-rule" />
-
-            <p className="kicker">{t.from}</p>
-            <h2 className="desk-name">{active.requesterName}</h2>
-            <p className="muted" style={{ marginTop: 0 }}>
-              {active.requesterEmail}
-            </p>
-
-            <p className="kicker" style={{ marginTop: 32 }}>
-              {t.originalNeed}
-            </p>
-            <p className="desk-brief">{active.needText}</p>
-            {active.userNote && <p className="note">{active.userNote}</p>}
-
-            <p className="kicker" style={{ marginTop: 32 }}>
-              {t.selectedCol}
-            </p>
-            <ul className="desk-people">
-              {active.researchers.map((person) => (
-                <li key={person.id}>
-                  <Link to={`/researchers/${person.id}`}>{person.fullName}</Link>
-                  {person.academicPosition ? <span>{person.academicPosition}</span> : null}
-                </li>
-              ))}
-            </ul>
-
-            <label htmlFor="dnote">{t.directorNote}</label>
-            <textarea
-              id="dnote"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder={t.notePlaceholder}
-            />
-            <div className="btn-row decision-row">
-              <button className="btn" type="button" disabled={busy} onClick={() => decide('approved')}>
-                {t.approve}
-              </button>
-              <button className="btn btn-ghost" type="button" disabled={busy} onClick={() => decide('rejected')}>
-                {t.reject}
-              </button>
-              <button className="btn-text" type="button" disabled={busy} onClick={() => decide('changes_requested')}>
-                {t.requestChanges}
-              </button>
+      {!active ? null : (
+        <article className="letter letter-wide review-doc letter-doc">
+          <header className="letterhead">
+            <div>
+              <p className="mono muted" style={{ margin: 0 }}>
+                {active.code}
+              </p>
+              <p className="muted" style={{ margin: '8px 0 0', fontSize: 13 }}>
+                {dateFmt.format(new Date(active.createdAt))}
+              </p>
             </div>
-          </article>
-        )}
-      </section>
+            <StatusStamp status={active.status} />
+          </header>
+          <hr className="gold-rule" />
+
+          <div className="doc-spread">
+            <div>
+              <p className="kicker">{t.from}</p>
+              <h2 className="desk-name">{active.requesterName}</h2>
+              <p className="muted" style={{ marginTop: 0 }}>
+                {active.requesterEmail}
+              </p>
+              <p className="kicker" style={{ marginTop: 32 }}>
+                {t.originalNeed}
+              </p>
+              <p className="desk-brief">{active.needText}</p>
+              {active.userNote ? <p className="note">{active.userNote}</p> : null}
+            </div>
+            <aside className="doc-side">
+              <p className="kicker">{t.selectedCol}</p>
+              <ul className="desk-people">
+                {active.researchers.map((person) => (
+                  <li key={person.id}>
+                    <Link to={`/researchers/${person.id}`}>{person.fullName}</Link>
+                    {person.academicPosition ? <span>{person.academicPosition}</span> : null}
+                  </li>
+                ))}
+              </ul>
+              <label htmlFor="dnote">{t.directorNote}</label>
+              <textarea
+                id="dnote"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder={t.notePlaceholder}
+              />
+              <div className="btn-row decision-row">
+                <button className="btn" type="button" disabled={busy} onClick={() => decide('approved')}>
+                  {t.approve}
+                </button>
+                <button className="btn btn-ghost" type="button" disabled={busy} onClick={() => decide('rejected')}>
+                  {t.reject}
+                </button>
+                <button className="btn-text" type="button" disabled={busy} onClick={() => decide('changes_requested')}>
+                  {t.requestChanges}
+                </button>
+              </div>
+            </aside>
+          </div>
+        </article>
+      )}
     </main>
   )
 }

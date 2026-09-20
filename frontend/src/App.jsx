@@ -1,6 +1,6 @@
 /**
  * What changed: App routes for the six MVP areas.
- * Why: Login, profiles, need, recommendations, requests, and director desk.
+ * Why: Login, home, recommendations, profiles, and director review stay on the same paths.
  * Related: src/pages/*
  */
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'

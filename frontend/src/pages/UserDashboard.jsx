@@ -1,27 +1,52 @@
 /**
- * What changed: Standard users now get a desk — queue + brief/status — like the director.
- * Why: After login they only saw a form, so it felt like the dashboard never changed.
- * Related: src/pages/DirectorDashboard.jsx
+ * What changed: Compose and request docs now use a two-column spread so the page is not half empty.
+ * Why: A narrow letter on a wide screen looked unfinished to the client.
+ * Related: src/pages/DirectorDashboard.jsx, src/styles/global.css
+ * MCP Context 7: React 19 view state, no extra layout library.
  */
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { MatchCurtain } from '../components/MatchCurtain'
 import { Seal } from '../components/Seal'
 import { StatusStamp } from '../components/StatusStamp'
 import { useAuth } from '../context/AuthContext'
 import { useI18n } from '../context/I18nContext'
 import { api } from '../lib/api'
 
+const CURTAIN_MIN_MS = 1400
+
+function initials(name = '') {
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+}
+
+function nextStepCopy(status, t) {
+  if (status === 'approved') return t.nextStepApproved
+  if (status === 'rejected') return t.nextStepRejected
+  if (status === 'changes_requested') return t.nextStepChanges
+  return t.nextStepPending
+}
+
 export function UserDashboard() {
   const { t, lang } = useI18n()
   const { user } = useAuth()
   const navigate = useNavigate()
   const [requests, setRequests] = useState([])
-  const [activeId, setActiveId] = useState('new')
+  const [view, setView] = useState('home')
   const [text, setText] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
   const examples = [t.ex1, t.ex2, t.ex3, t.ex4]
+  const firstName = user?.name?.split(' ')[0] || ''
+  const latest = requests[0]
+  const older = requests.slice(1)
+  const active = requests.find((item) => item.id === view)
+
   const today = new Intl.DateTimeFormat(lang === 'ar' ? 'ar' : 'en-GB', {
     day: 'numeric',
     month: 'short',
@@ -39,154 +64,205 @@ export function UserDashboard() {
       .catch((err) => setError(err.message))
   }, [])
 
-  const active = requests.find((item) => item.id === activeId)
-
   async function onSubmit(event) {
     event.preventDefault()
     setBusy(true)
     setError('')
+    const started = Date.now()
     try {
       const data = await api('/api/match', {
         method: 'POST',
         body: JSON.stringify({ needText: text, language: lang }),
       })
+      // Hold the curtain long enough to read — instant APIs felt unfinished.
+      const wait = Math.max(0, CURTAIN_MIN_MS - (Date.now() - started))
+      await new Promise((resolve) => setTimeout(resolve, wait))
       navigate(`/recommendations/${data.matchId}`)
     } catch (err) {
       setError(err.message)
-    } finally {
       setBusy(false)
     }
   }
 
-  return (
-    <main className="desk">
-      <aside className="desk-queue">
-        <div className="desk-queue-head">
-          <p className="kicker" style={{ marginBottom: 6 }}>
-            {t.navDesk}
-          </p>
-          <h1>{t.hello.replace('{name}', user?.name?.split(' ')[0] || '')}</h1>
-          <p className="muted" style={{ margin: '6px 0 0', fontSize: 13 }}>
-            {requests.length} · {t.navRequests}
-          </p>
-        </div>
+  if (busy) {
+    return <MatchCurtain needText={text} />
+  }
 
-        <div className="desk-list">
-          <button
-            type="button"
-            className={`desk-item ${activeId === 'new' ? 'on' : ''}`}
-            onClick={() => setActiveId('new')}
-          >
-            <span className="mono muted">{t.briefLabel}</span>
-            <strong>{t.newBrief}</strong>
-            <em>{t.needLede}</em>
+  // --- Home: greeting + plates, not a ticket list ---
+  if (view === 'home') {
+    return (
+      <main className="institute rise">
+        <header className="institute-hero">
+          <p className="kicker">{t.needKicker}</p>
+          <h1>{t.hello.replace('{name}', firstName)}</h1>
+          <p className="lede">{t.homeLede}</p>
+        </header>
+
+        {error ? <p className="error">{error}</p> : null}
+
+        <div className="plates">
+          <button type="button" className="plate plate-primary" onClick={() => setView('compose')}>
+            <span className="kicker">{t.briefLabel}</span>
+            <h2>{t.newBrief}</h2>
+            <p>{t.needLede}</p>
+            <span className="plate-go">{t.beginBrief}</span>
           </button>
 
-          {requests.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className={`desk-item ${activeId === item.id ? 'on' : ''}`}
-              onClick={() => setActiveId(item.id)}
-            >
-              <span className="mono muted">{item.code}</span>
-              <strong>
-                {item.needText.slice(0, 48)}
-                {item.needText.length > 48 ? '…' : ''}
-              </strong>
-              <em>{item.selectedNames.join(' · ')}</em>
+          {latest ? (
+            <button type="button" className="plate" onClick={() => setView(latest.id)}>
+              <span className="kicker">{t.latestRequest}</span>
+              <h2>{latest.code}</h2>
+              <StatusStamp status={latest.status} />
+              <p>
+                {latest.needText.slice(0, 110)}
+                {latest.needText.length > 110 ? '…' : ''}
+              </p>
+              <span className="plate-go">{t.openRequest}</span>
             </button>
-          ))}
+          ) : (
+            <div className="plate plate-quiet">
+              <span className="kicker">{t.navRequests}</span>
+              <h2>{t.emptyRequests}</h2>
+            </div>
+          )}
         </div>
-      </aside>
 
-      <section className="desk-stage">
-        {error && !active && activeId !== 'new' ? <p className="error">{error}</p> : null}
-
-        {activeId === 'new' ? (
-          <form className="composer" onSubmit={onSubmit}>
-            <article className="letter desk-letter">
-              <header className="letterhead">
-                <Seal size={34} />
-                <div className="letter-meta">
-                  <span>{t.briefLabel}</span>
-                  <span>{today}</span>
-                  <span>
-                    {t.languageLabel} · {lang === 'ar' ? t.arabic : t.english}
-                  </span>
-                </div>
-              </header>
-              <hr className="gold-rule" />
-              <h1 className="composer-title">{t.needTitle}</h1>
-              <p className="lede" style={{ marginBottom: 8 }}>
-                {t.needLede}
-              </p>
-              {error && <p className="error">{error}</p>}
-              <textarea
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder={t.needPlaceholder}
-                required
-                minLength={12}
-              />
-              <p className="muted" style={{ margin: '18px 0 8px', fontSize: 13 }}>
-                {t.examples}
-              </p>
-              <div className="chips">
-                {examples.map((example) => (
-                  <button key={example} type="button" className="chip" onClick={() => setText(example)}>
-                    {example}
-                  </button>
-                ))}
-              </div>
-              <button className="btn" type="submit" disabled={busy}>
-                {busy ? t.matching : t.findMatches}
+        {older.length > 0 ? (
+          <section className="home-list">
+            <p className="kicker">{t.navRequests}</p>
+            {older.map((item) => (
+              <button key={item.id} type="button" className="home-row" onClick={() => setView(item.id)}>
+                <span className="mono muted">{item.code}</span>
+                <strong>
+                  {item.needText.slice(0, 72)}
+                  {item.needText.length > 72 ? '…' : ''}
+                </strong>
+                <StatusStamp status={item.status} />
               </button>
-            </article>
-          </form>
-        ) : active ? (
-          <article className="letter desk-letter">
+            ))}
+          </section>
+        ) : null}
+      </main>
+    )
+  }
+
+  // --- Compose: one letter, full stage ---
+  if (view === 'compose') {
+    return (
+      <main className="institute institute-stage rise">
+        <button type="button" className="btn-text back-line" onClick={() => setView('home')}>
+          {t.backHome}
+        </button>
+        <form className="composer" onSubmit={onSubmit}>
+          <article className="letter letter-wide">
             <header className="letterhead">
-              <div>
-                <p className="mono muted" style={{ margin: 0 }}>
-                  {active.code}
-                </p>
-                <p className="muted" style={{ margin: '8px 0 0', fontSize: 13 }}>
-                  {dateFmt.format(new Date(active.createdAt))}
-                </p>
+              <Seal size={34} />
+              <div className="letter-meta">
+                <span>{t.briefLabel}</span>
+                <span>{today}</span>
+                <span>
+                  {t.languageLabel} · {lang === 'ar' ? t.arabic : t.english}
+                </span>
               </div>
-              <StatusStamp status={active.status} />
             </header>
             <hr className="gold-rule" />
-            <p className="kicker">{t.originalNeed}</p>
-            <p className="desk-brief">{active.needText}</p>
-            <p className="kicker" style={{ marginTop: 32 }}>
-              {t.selectedCol}
-            </p>
-            <ul className="desk-people">
-              {active.researchers.map((person) => (
-                <li key={person.id}>
-                  <Link to={`/researchers/${person.id}`}>{person.fullName}</Link>
-                  {person.academicPosition ? <span>{person.academicPosition}</span> : null}
-                </li>
-              ))}
-            </ul>
-            {active.directorNote && (
-              <div className="note">
-                <strong>{t.directorNote}: </strong>
-                {active.directorNote}
+            {/* Write on the left, examples on the right — fills the wide page. */}
+            <div className="compose-spread">
+              <div>
+                <h1 className="composer-title">{t.needTitle}</h1>
+                <p className="lede" style={{ marginBottom: 8 }}>
+                  {t.needLede}
+                </p>
+                {error ? <p className="error">{error}</p> : null}
+                <textarea
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  placeholder={t.needPlaceholder}
+                  required
+                  minLength={12}
+                />
+                <button className="btn" type="submit" style={{ marginTop: 22 }}>
+                  {t.findMatches}
+                </button>
               </div>
-            )}
-            <div className="btn-row" style={{ marginTop: 28 }}>
-              <button type="button" className="btn btn-ghost" onClick={() => setActiveId('new')}>
-                {t.newBrief}
-              </button>
+              <aside className="compose-side">
+                <p className="kicker">{t.examples}</p>
+                <div className="chips">
+                  {examples.map((example) => (
+                    <button key={example} type="button" className="chip" onClick={() => setText(example)}>
+                      {example}
+                    </button>
+                  ))}
+                </div>
+              </aside>
             </div>
           </article>
-        ) : (
-          <p className="empty">{t.emptyRequests}</p>
-        )}
-      </section>
+        </form>
+      </main>
+    )
+  }
+
+  // --- One request as a document, not a split inbox ---
+  return (
+    <main className="institute institute-stage rise">
+      <button type="button" className="btn-text back-line" onClick={() => setView('home')}>
+        {t.backHome}
+      </button>
+      {active ? (
+        <article className="open-doc">
+          <header className="letterhead">
+            <div>
+              <p className="mono muted" style={{ margin: 0 }}>
+                {active.code}
+              </p>
+              <p className="muted" style={{ margin: '8px 0 0', fontSize: 13 }}>
+                {dateFmt.format(new Date(active.createdAt))}
+              </p>
+            </div>
+            <StatusStamp status={active.status} />
+          </header>
+          <hr className="gold-rule" />
+          <div className="doc-spread">
+            <div>
+              <p className="kicker">{t.originalNeed}</p>
+              <p className="desk-brief">{active.needText}</p>
+            </div>
+            <aside className="doc-side">
+              <p className="kicker">{t.selectedCol}</p>
+              <ul className="desk-people">
+                {active.researchers.map((person) => (
+                  <li key={person.id}>
+                    <div className="who">
+                      <div className="avatar">{initials(person.fullName)}</div>
+                      <div>
+                        <Link to={`/researchers/${person.id}`}>{person.fullName}</Link>
+                        {person.academicPosition ? <span>{person.academicPosition}</span> : null}
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <div className="note">
+                <strong>{t.directorNote}: </strong>
+                {active.directorNote || t.noDirectorNote}
+              </div>
+            </aside>
+          </div>
+          <div className="status-band">
+            <div>
+              <StatusStamp status={active.status} />
+              <p className="lede" style={{ margin: '10px 0 0' }}>
+                {nextStepCopy(active.status, t)}
+              </p>
+            </div>
+            <button type="button" className="btn" onClick={() => setView('compose')}>
+              {t.newBrief}
+            </button>
+          </div>
+        </article>
+      ) : (
+        <p className="empty">{t.emptyRequests}</p>
+      )}
     </main>
   )
 }

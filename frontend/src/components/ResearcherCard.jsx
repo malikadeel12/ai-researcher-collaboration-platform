@@ -1,6 +1,6 @@
 /**
- * What changed: Selected dossiers now get a gold edge instead of a loud copper button.
- * Why: Quiet selection reads as considered, not like a shopping cart.
+ * What changed: Cards now have feature / compact / default so ranking can be shown.
+ * Why: Equal tiles hid the closest fit and made recommendations look like a catalog.
  * Related: src/pages/Recommendations.jsx
  */
 import { Link } from 'react-router-dom'
@@ -16,12 +16,48 @@ function initials(name = '') {
     .join('')
 }
 
-export function ResearcherCard({ researcher, reason, score, selected, onSelect }) {
+export function ResearcherCard({ researcher, reason, score, selected, onSelect, variant = 'card' }) {
   const { t } = useI18n()
   if (!researcher) return null
 
+  const actions = (
+    <div className="btn-row">
+      <Link className="btn btn-ghost" to={`/researchers/${researcher.id}`}>
+        {t.viewProfile}
+      </Link>
+      {onSelect ? (
+        <button className={selected ? 'btn btn-ghost' : 'btn'} type="button" onClick={onSelect}>
+          {selected ? t.selected : t.select}
+        </button>
+      ) : null}
+    </div>
+  )
+
+  // --- Compact row: everyone after the closest fit ---
+  if (variant === 'compact') {
+    return (
+      <article className={`compare-row ${selected ? 'is-selected' : ''}`}>
+        <div>
+          <h3>{researcher.fullName}</h3>
+          <p className="muted">{researcher.academicPosition}</p>
+          {reason ? <p className="why">{reason}</p> : null}
+        </div>
+        <div className="compare-row-meta">
+          {score != null ? (
+            <span className="score">
+              {score} {t.matchScore}
+            </span>
+          ) : null}
+          {actions}
+        </div>
+      </article>
+    )
+  }
+
+  const isFeature = variant === 'feature'
+
   return (
-    <article className={`dossier ${selected ? 'is-selected' : ''}`}>
+    <article className={`dossier ${isFeature ? 'feature-match' : ''} ${selected ? 'is-selected' : ''}`}>
       <div className="dossier-top">
         <div className="who">
           <div className="avatar">{initials(researcher.fullName)}</div>
@@ -30,16 +66,16 @@ export function ResearcherCard({ researcher, reason, score, selected, onSelect }
             <p>{researcher.academicPosition}</p>
           </div>
         </div>
-        {score != null && (
+        {score != null ? (
           <div className="score">
             {score} {t.matchScore}
           </div>
-        )}
+        ) : null}
       </div>
 
       <div className="stamps">
         <StatusStamp status={researcher.availabilityStatus || 'available'} />
-        {researcher.willingnessToLead && <span className="stamp stamp-lead">{t.willLead}</span>}
+        {researcher.willingnessToLead ? <span className="stamp stamp-lead">{t.willLead}</span> : null}
       </div>
 
       <div className="pills">
@@ -50,23 +86,14 @@ export function ResearcherCard({ researcher, reason, score, selected, onSelect }
         ))}
       </div>
 
-      {reason && (
+      {reason ? (
         <p className="why">
           <strong>{t.why}. </strong>
           {reason}
         </p>
-      )}
+      ) : null}
 
-      <div className="btn-row">
-        <Link className="btn btn-ghost" to={`/researchers/${researcher.id}`}>
-          {t.viewProfile}
-        </Link>
-        {onSelect && (
-          <button className={selected ? 'btn btn-ghost' : 'btn'} type="button" onClick={onSelect}>
-            {selected ? t.selected : t.select}
-          </button>
-        )}
-      </div>
+      {actions}
     </article>
   )
 }
@@ -85,12 +112,12 @@ export function TeamCard({ members, reason, selected, onSelect }) {
       <h3 className="serif" style={{ margin: '0 0 8px', fontSize: 22 }}>
         {members.map((member) => member.fullName).join(' · ')}
       </h3>
-      {reason && (
+      {reason ? (
         <p className="why">
           <strong>{t.why}. </strong>
           {reason}
         </p>
-      )}
+      ) : null}
       <div className="pills">
         {members.flatMap((member) => (member.keywords || []).slice(0, 2)).map((tag) => (
           <span className="pill" key={tag}>
@@ -104,11 +131,11 @@ export function TeamCard({ members, reason, selected, onSelect }) {
             {member.fullName.split(' ')[0]}
           </Link>
         ))}
-        {onSelect && (
+        {onSelect ? (
           <button className={selected ? 'btn btn-ghost' : 'btn'} type="button" onClick={onSelect}>
             {selected ? t.selected : t.select}
           </button>
-        )}
+        ) : null}
       </div>
     </article>
   )

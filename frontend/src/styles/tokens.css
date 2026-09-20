@@ -1,6 +1,6 @@
 /**
- * What changed: Editorial design tokens for the Markaz research-center look.
- * Why: Warm paper + ink + teal avoids generic purple SaaS / AI-template styling.
+ * What changed: Quiet Atelier tokens — more air, one metal accent, motion timing.
+ * Why: Same Markaz colours, but spacing and gold are used like a research institute letterhead.
  * Related: src/styles/global.css
  */
 :root {
@@ -12,7 +12,7 @@
   --teal: #1a4544;
   --teal-deep: #123534;
   --copper: #c45c26;
-  --gold: #c4A46a;
+  --gold: #c4a46a;
   --sage: #3e6b54;
   --clay: #a33b2b;
   --amber: #b07d2a;
@@ -25,9 +25,10 @@
   --arabic: "IBM Plex Sans Arabic", "Source Sans 3", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, monospace;
 
-  --radius: 7px;
-  --max: 1120px;
-  --header-h: 64px;
+  --radius: 5px;
+  --max: 1080px;
+  --header-h: 72px;
+  --ease: 160ms ease;
 }
 
 [lang="ar"] {

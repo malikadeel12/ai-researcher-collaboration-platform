@@ -1,6 +1,6 @@
 /**
- * What changed: Director inbox — list on the left, review + decision on the right.
- * Why: Brief asks for request management, not analytics.
+ * What changed: Director actions are quiet — one Approve, ghost Reject, text for changes.
+ * Why: Three candy-colored buttons made the desk look like an admin panel.
  * Related: backend/src/routes/requests.js
  */
 import { useEffect, useMemo, useState } from 'react'
@@ -106,13 +106,17 @@ export function DirectorDashboard() {
               <p className="mono muted">
                 {t.requestId} {active.code}
               </p>
-              <h2 style={{ marginTop: 8 }}>{active.requesterName}</h2>
+              <h2 className="serif" style={{ marginTop: 10, fontSize: 32 }}>
+                {active.requesterName}
+              </h2>
               <p className="muted">{active.requesterEmail}</p>
-              <h3 style={{ marginTop: 28 }}>{t.originalNeed}</h3>
+              <h3 className="kicker" style={{ marginTop: 36 }}>
+                {t.originalNeed}
+              </h3>
               <p className="quote">{active.needText}</p>
               {active.userNote && <p className="note">{active.userNote}</p>}
-              <h3>{t.selectedCol}</h3>
-              <div className="pills" style={{ marginBottom: 20 }}>
+              <h3 className="kicker">{t.selectedCol}</h3>
+              <div className="pills" style={{ marginBottom: 24 }}>
                 {active.researchers.map((person) => (
                   <Link key={person.id} className="pill" to={`/researchers/${person.id}`}>
                     {person.fullName}
@@ -127,14 +131,14 @@ export function DirectorDashboard() {
                 placeholder={t.notePlaceholder}
                 style={{ minHeight: 100 }}
               />
-              <div className="btn-row" style={{ marginTop: 14 }}>
-                <button className="btn btn-sage" type="button" disabled={busy} onClick={() => decide('approved')}>
+              <div className="btn-row decision-row">
+                <button className="btn" type="button" disabled={busy} onClick={() => decide('approved')}>
                   {t.approve}
                 </button>
-                <button className="btn btn-clay" type="button" disabled={busy} onClick={() => decide('rejected')}>
+                <button className="btn btn-ghost" type="button" disabled={busy} onClick={() => decide('rejected')}>
                   {t.reject}
                 </button>
-                <button className="btn btn-amber" type="button" disabled={busy} onClick={() => decide('changes_requested')}>
+                <button className="btn-text" type="button" disabled={busy} onClick={() => decide('changes_requested')}>
                   {t.requestChanges}
                 </button>
               </div>

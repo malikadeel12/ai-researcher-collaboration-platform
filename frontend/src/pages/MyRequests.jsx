@@ -1,6 +1,6 @@
 /**
- * What changed: User-facing request list with director notes.
- * Why: Users must see Pending / Approved / Rejected / Changes Requested.
+ * What changed: Requests are letter rows instead of an admin table.
+ * Why: A register of briefs feels institutional; a spreadsheet does not.
  * Related: backend/src/routes/requests.js
  */
 import { useEffect, useState } from 'react'
@@ -20,7 +20,7 @@ export function MyRequests() {
       .catch((err) => setError(err.message))
   }, [])
 
-  const dateFmt = new Intl.DateTimeFormat(lang === 'ar' ? 'ar' : 'en', {
+  const dateFmt = new Intl.DateTimeFormat(lang === 'ar' ? 'ar' : 'en-GB', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -37,39 +37,30 @@ export function MyRequests() {
           {t.emptyRequests} <Link className="linkish" to="/need">{t.navNeed}</Link>
         </p>
       ) : (
-        <table className="table">
-          <thead>
-            <tr>
-              <th>{t.requestId}</th>
-              <th>{t.needCol}</th>
-              <th>{t.selectedCol}</th>
-              <th>{t.dateCol}</th>
-              <th>{t.statusCol}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {requests.map((item) => (
-              <tr key={item.id}>
-                <td className="mono">{item.code}</td>
-                <td>
+        <div className="letter-list">
+          {requests.map((item) => (
+            <article className="letter-row" key={item.id}>
+              <span className="mono muted">{item.code}</span>
+              <div>
+                <h3>
                   {item.needText.slice(0, 90)}
                   {item.needText.length > 90 ? '…' : ''}
-                  {item.directorNote && (
-                    <div className="note">
-                      <strong>{t.directorNote}: </strong>
-                      {item.directorNote}
-                    </div>
-                  )}
-                </td>
-                <td>{item.selectedNames.join(' · ')}</td>
-                <td className="mono">{dateFmt.format(new Date(item.createdAt))}</td>
-                <td>
-                  <StatusStamp status={item.status} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </h3>
+                <p className="muted" style={{ margin: 0 }}>
+                  {item.selectedNames.join(' · ')}
+                </p>
+                {item.directorNote && (
+                  <div className="note">
+                    <strong>{t.directorNote}: </strong>
+                    {item.directorNote}
+                  </div>
+                )}
+              </div>
+              <span className="mono muted">{dateFmt.format(new Date(item.createdAt))}</span>
+              <StatusStamp status={item.status} />
+            </article>
+          ))}
+        </div>
       )}
     </main>
   )

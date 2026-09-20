@@ -1,20 +1,23 @@
 /**
- * What changed: Shared header for authenticated screens.
- * Why: Navigation stays quiet so the research brief and dossiers remain the focus.
- * Related: src/App.jsx
+ * What changed: Header now uses the seal, a gold active line, and a quiet sign-out.
+ * Why: Premium clients read the chrome first — the bar should feel like letterhead, not a SaaS nav.
+ * Related: src/components/Seal.jsx
  */
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useI18n } from '../context/I18nContext'
+import { LanguageToggle } from './LanguageToggle'
+import { Seal } from './Seal'
 
 export function AppShell() {
-  const { t, lang, setLang } = useI18n()
+  const { t } = useI18n()
   const { user, logout } = useAuth()
 
   return (
     <div className="shell">
       <header className="header">
         <NavLink to={user ? '/need' : '/login'} className="brand">
+          <Seal size={28} />
           <span className="brand-mark">{t.brand}</span>
           <span className="brand-sub">{t.brandSub}</span>
         </NavLink>
@@ -27,18 +30,17 @@ export function AppShell() {
               {user.role === 'director' && <NavLink to="/director">{t.navDirector}</NavLink>}
             </>
           )}
-          <div className="lang-toggle">
-            <button type="button" className={lang === 'en' ? 'on' : ''} onClick={() => setLang('en')}>
-              EN
-            </button>
-            <button type="button" className={lang === 'ar' ? 'on' : ''} onClick={() => setLang('ar')}>
-              عربي
-            </button>
-          </div>
+          <LanguageToggle />
           {user && (
-            <button type="button" className="btn btn-ghost" onClick={logout}>
-              {t.logout}
-            </button>
+            <div className="nav-user">
+              <span className="who-name">
+                {user.name}
+                <span className="who-role">{user.role === 'director' ? t.roleDirector : t.roleUser}</span>
+              </span>
+              <button type="button" className="btn-text" onClick={logout}>
+                {t.logout}
+              </button>
+            </div>
           )}
         </nav>
       </header>

@@ -1,5 +1,5 @@
 /**
- * What changed: Arabic interface copy with RTL-first wording.
+ * What changed: Arabic copy, including letterhead labels for the atelier brief.
  * Why: The MVP must feel native in Arabic, not machine-translated UI leftovers.
  * Related: src/i18n/en.js
  */
@@ -12,10 +12,10 @@ export const ar = {
   logout: "خروج",
   login: "تسجيل الدخول",
   register: "إنشاء حساب",
-  loginTitle: "مرحباً بعودتك",
-  loginLede: "سجّل الدخول لوصف احتياج بحثي ومراجعة الترشيحات.",
-  registerTitle: "انضم إلى المركز",
-  registerLede: "يمكن للباحثين والجامعات الخارجية طلب التعاون.",
+  loginTitle: "تسجيل الدخول",
+  loginLede: "سجّل الدخول لإرسال احتياج بحثي ومراجعة الترشيحات.",
+  registerTitle: "إنشاء حساب",
+  registerLede: "للباحثين الزائرين وشركاء الجامعات.",
   name: "الاسم الكامل",
   email: "البريد الإلكتروني",
   password: "كلمة المرور",
@@ -96,5 +96,9 @@ export const ar = {
   requestNotePh: "لماذا يهم هذا التعاون، والجدول الزمني، أو النتيجة المتوقعة.",
   signedInAs: "مسجّل الدخول",
   roleUser: "مستخدم",
-  roleDirector: "مدير مركز الأبحاث",
+  roleDirector: "المدير",
+  briefLabel: "موجز",
+  languageLabel: "اللغة",
+  english: "الإنجليزية",
+  arabic: "العربية",
 }

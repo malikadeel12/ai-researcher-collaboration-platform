@@ -1,5 +1,5 @@
 /**
- * What changed: English copy for the bilingual MVP.
+ * What changed: English copy, including letterhead labels for the atelier brief.
  * Why: Interface language is separate from researcher dataset language.
  * Related: src/i18n/ar.js, src/context/I18nContext.jsx
  */
@@ -12,10 +12,10 @@ export const en = {
   logout: "Sign out",
   login: "Sign in",
   register: "Create account",
-  loginTitle: "Welcome back",
-  loginLede: "Sign in to describe a research need and review recommendations.",
-  registerTitle: "Join the center",
-  registerLede: "External researchers and university partners can request collaboration.",
+  loginTitle: "Sign in",
+  loginLede: "Use your account to submit a research need and review recommendations.",
+  registerTitle: "Create an account",
+  registerLede: "For visiting researchers and university partners.",
   name: "Full name",
   email: "Email",
   password: "Password",
@@ -97,5 +97,9 @@ export const en = {
   requestNotePh: "Why this collaboration matters, timeline, or expected outcome.",
   signedInAs: "Signed in as",
   roleUser: "Standard user",
-  roleDirector: "Research Center Director",
+  roleDirector: "Director",
+  briefLabel: "Brief",
+  languageLabel: "Language",
+  english: "English",
+  arabic: "Arabic",
 }

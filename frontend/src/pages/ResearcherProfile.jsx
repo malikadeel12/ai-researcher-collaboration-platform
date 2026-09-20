@@ -43,8 +43,8 @@ export function ResearcherProfile() {
 
   return (
     <main className="page">
-      <Link className="muted" to={-1}>
-        ← {t.back}
+      <Link className="btn-text" to={-1}>
+        {t.back}
       </Link>
       <div className="folio" style={{ marginTop: 24 }}>
         <aside className="folio-side">

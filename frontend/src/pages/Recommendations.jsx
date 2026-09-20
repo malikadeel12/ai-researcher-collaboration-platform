@@ -1,6 +1,6 @@
 /**
- * What changed: Individual + optional team recommendations with selection.
- * Why: Users must review the reason, then choose before a request is filed.
+ * What changed: Recommendation page keeps the brief quote and uses a single teal submit.
+ * Why: Copper CTAs were too loud for the atelier finish.
  * Related: backend/src/routes/match.js, backend/src/routes/requests.js
  */
 import { useEffect, useState } from 'react'
@@ -107,7 +107,7 @@ export function Recommendations() {
         <textarea id="note" value={note} onChange={(e) => setNote(e.target.value)} placeholder={t.requestNotePh} style={{ minHeight: 110 }} />
       </div>
 
-      <button className="btn btn-copper" type="button" disabled={!selection || busy} onClick={submit}>
+      <button className="btn" type="button" disabled={!selection || busy} onClick={submit}>
         {busy ? t.submitting : t.submitRequest}
       </button>
     </main>

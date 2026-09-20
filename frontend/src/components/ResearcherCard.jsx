@@ -1,6 +1,6 @@
 /**
- * What changed: Dossier-style researcher and team recommendation cards.
- * Why: Users should see why a match exists before they select anyone.
+ * What changed: Selected dossiers now get a gold edge instead of a loud copper button.
+ * Why: Quiet selection reads as considered, not like a shopping cart.
  * Related: src/pages/Recommendations.jsx
  */
 import { Link } from 'react-router-dom'
@@ -21,7 +21,7 @@ export function ResearcherCard({ researcher, reason, score, selected, onSelect }
   if (!researcher) return null
 
   return (
-    <article className="dossier">
+    <article className={`dossier ${selected ? 'is-selected' : ''}`}>
       <div className="dossier-top">
         <div className="who">
           <div className="avatar">{initials(researcher.fullName)}</div>
@@ -62,7 +62,7 @@ export function ResearcherCard({ researcher, reason, score, selected, onSelect }
           {t.viewProfile}
         </Link>
         {onSelect && (
-          <button className={selected ? 'btn btn-copper' : 'btn'} type="button" onClick={onSelect}>
+          <button className={selected ? 'btn btn-ghost' : 'btn'} type="button" onClick={onSelect}>
             {selected ? t.selected : t.select}
           </button>
         )}
@@ -74,7 +74,7 @@ export function ResearcherCard({ researcher, reason, score, selected, onSelect }
 export function TeamCard({ members, reason, selected, onSelect }) {
   const { t } = useI18n()
   return (
-    <article className="dossier team-card">
+    <article className={`dossier team-card ${selected ? 'is-selected' : ''}`}>
       <div className="who-row">
         {members.map((member) => (
           <div className="avatar" key={member.id} title={member.fullName}>
@@ -105,7 +105,7 @@ export function TeamCard({ members, reason, selected, onSelect }) {
           </Link>
         ))}
         {onSelect && (
-          <button className={selected ? 'btn btn-copper' : 'btn'} type="button" onClick={onSelect}>
+          <button className={selected ? 'btn btn-ghost' : 'btn'} type="button" onClick={onSelect}>
             {selected ? t.selected : t.select}
           </button>
         )}

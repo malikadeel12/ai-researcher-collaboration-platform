@@ -107,4 +107,5 @@ export const ar = {
   languageLabel: "اللغة",
   english: "الإنجليزية",
   arabic: "العربية",
+  demoHint: "عرض تجريبي — بلا خادم. جرّب هذه الحسابات:",
 }

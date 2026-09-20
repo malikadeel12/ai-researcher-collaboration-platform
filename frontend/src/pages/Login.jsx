@@ -8,6 +8,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { AuthFolio } from '../components/AuthFolio'
 import { useAuth } from '../context/AuthContext'
 import { useI18n } from '../context/I18nContext'
+import { isDemoMode } from '../lib/api'
 
 export function Login() {
   const { t } = useI18n()
@@ -49,9 +50,18 @@ export function Login() {
         <button className="btn" type="submit" disabled={busy}>
           {t.login}
         </button>
-        <p className="muted" style={{ marginTop: 18 }}>
-          {t.noAccount} <Link className="linkish" to="/register">{t.register}</Link>
-        </p>
+          <p className="muted" style={{ marginTop: 18 }}>
+            {t.noAccount} <Link className="linkish" to="/register">{t.register}</Link>
+          </p>
+          {isDemoMode() && (
+            <p className="note" style={{ marginTop: 22 }}>
+              {t.demoHint}
+              <br />
+              {t.roleUser}: sara@university.edu / test1234
+              <br />
+              {t.roleDirector}: director@research.center / Director2026!
+            </p>
+          )}
       </form>
     </AuthFolio>
   )

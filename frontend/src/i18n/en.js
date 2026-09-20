@@ -108,4 +108,5 @@ export const en = {
   languageLabel: "Language",
   english: "English",
   arabic: "Arabic",
+  demoHint: "Client demo — no server. Try these accounts:",
 }
